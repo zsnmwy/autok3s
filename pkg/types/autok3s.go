@@ -48,6 +48,7 @@ type Metadata struct {
 	RegistryContent string      `json:"registry-content,omitempty" yaml:"registry-content,omitempty"`
 	Manifests       string      `json:"manifests,omitempty" yaml:"manifests,omitempty"`
 	Enable          StringArray `json:"enable,omitempty" yaml:"enable,omitempty" gorm:"type:stringArray"`
+	Rollback        bool        `json:"rollback" yaml:"rollback"`
 }
 
 // Status struct for status.

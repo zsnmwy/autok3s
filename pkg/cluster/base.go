@@ -37,6 +37,7 @@ const (
 	defaultCidr         = "10.42.0.0/16"
 	uploadManifestCmd   = "echo \"%s\" | base64 -d | sudo tee \"%s/%s\""
 	dockerInstallScript = "https://get.docker.com"
+	rollback            = true
 )
 
 // ProviderBase provider base struct.
@@ -68,6 +69,7 @@ func NewBaseProvider() *ProviderBase {
 			Worker:        worker,
 			ClusterCidr:   defaultCidr,
 			DockerScript:  dockerInstallScript,
+			Rollback:      rollback,
 		},
 		Status: types.Status{
 			MasterNodes: make([]types.Node, 0),
@@ -204,6 +206,12 @@ func (p *ProviderBase) GetClusterOptions() []types.Flag {
 			P:     &p.Worker,
 			V:     p.Worker,
 			Usage: "Number of worker node",
+		},
+		{
+			Name:  "rollback",
+			P:     &p.Rollback,
+			V:     p.Rollback,
+			Usage: "Rollback instance",
 		},
 	}
 
@@ -926,6 +934,10 @@ func (p *ProviderBase) Connect(ip string, ssh *types.SSH, c *types.Cluster, getS
 
 // RollbackCluster rollback when error occur.
 func (p *ProviderBase) RollbackCluster(rollbackInstance func(ids []string) error) error {
+	if !p.Rollback {
+		p.Logger.Infof("Found Rollback Status is %v, Stop Rollback", p.Rollback)
+		return nil
+	}
 	p.Logger.Infof("[%s] executing rollback logic...", p.Provider)
 	if rollbackInstance != nil {
 		ids := make([]string, 0)
